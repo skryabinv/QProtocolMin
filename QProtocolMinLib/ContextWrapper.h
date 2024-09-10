@@ -30,8 +30,7 @@ public:
     ~ContextWrapper();
     void send(quint8 id, const QByteArray& payload);
     void poll(const QByteArray& bytes);
-private:
-    QByteArray mBytesToSend;
+private:    
     friend void ::min_tx_byte(uint8_t port, uint8_t byte);
     friend void ::min_tx_start(uint8_t port);
     friend void ::min_tx_finished(uint8_t port);
@@ -43,6 +42,7 @@ private:
     void handleFrame(uint8_t min_id,
                      uint8_t const *min_payload,
                      uint8_t len_payload);
+    QByteArray mBytesToSend;
     std::unique_ptr<min_context> mContext{};
     quint8 mPortId{};
 };
