@@ -1,0 +1,3 @@
+[submodule "QProtocolMinLib/min"]
+	path = QProtocolMinLib/min
+	url = https://github.com/min-protocol/min.git

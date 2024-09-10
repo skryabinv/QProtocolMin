@@ -16,4 +16,4 @@ add_executable(QProtocolMinDemo
   main.cpp
 )
 target_link_libraries(QProtocolMinDemo Qt${QT_VERSION_MAJOR}::Core)
-
+target_link_libraries(QProtocolMinDemo QProtocolMinLib)
