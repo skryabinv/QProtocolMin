@@ -16,8 +16,10 @@ public:
     void sendFrame(quint8 id, const QByteArray& payload);
     bool waitFrame(quint8& id, QByteArray& payload, quint32 timeoutMs);
 signals:
+    void error(const QString& message);
     void frameReceived(quint8 id, const QByteArray& payload);
 private:
+    void onSerialPortError();
     void onSerialPortReadyRead();
     void onFrameReadyWrite(const QByteArray& frameBytes);
     QSerialPort* mSerialPort{};

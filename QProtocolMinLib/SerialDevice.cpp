@@ -13,6 +13,8 @@ SerialDevice::SerialDevice(QObject *parent)
     mSerialPort = new QSerialPort{this};
     connect(mSerialPort, &QSerialPort::readyRead,
             this, &SerialDevice::onSerialPortReadyRead);
+    connect(mSerialPort, &QSerialPort::errorOccurred,
+            this, &SerialDevice::onSerialPortError);
     connect(mContextWrapper, &ContextWrapper::frameSended,
             this, &SerialDevice::onFrameReadyWrite);
     connect(mContextWrapper, &ContextWrapper::frameReceived,
@@ -51,8 +53,14 @@ bool SerialDevice::waitFrame(quint8& idOut, QByteArray& payloadOut, quint32 time
     return loop.exec() == 1;
 }
 
+void SerialDevice::onSerialPortError() {
+    emit error(mSerialPort->errorString());
+}
+
 void SerialDevice::onSerialPortReadyRead() {
-    mContextWrapper->poll(mSerialPort->readAll());
+    auto bytes = mSerialPort->readAll();
+    qDebug() << __FUNCTION__ << bytes;
+    mContextWrapper->poll(bytes);
 }
 
 void SerialDevice::onFrameReadyWrite(const QByteArray& frameBytes) {
