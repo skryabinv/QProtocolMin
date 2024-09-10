@@ -17,7 +17,7 @@ public:
     bool waitFrame(quint8& id, QByteArray& payload, quint32 timeoutMs);
 signals:
     void error(const QString& message);
-    void frameReceived(quint8 id, const QByteArray& payload);
+    void frameReceived(quint8 idOut, const QByteArray& payloadOut);
 private:
     void onSerialPortError();
     void onSerialPortReadyRead();
