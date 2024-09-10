@@ -37,7 +37,7 @@ void min_application_handler(uint8_t min_id,
 
 namespace min {
 
-static auto findEmptyContextId() -> std::optional<quint8> {
+static inline auto findEmptyContextId() -> std::optional<quint8> {
     static_assert(sContextStorage.size() < std::numeric_limits<quint8>::max());
     for(quint8 id = 0; id < sContextStorage.size(); id++) {
         if(sContextStorage[id] == nullptr) {
@@ -61,12 +61,14 @@ ContextWrapper::ContextWrapper(QObject* parent)
 }
 
 ContextWrapper::~ContextWrapper() {
-    sContextStorage[mPortId] = nullptr;
+    if(mContext != nullptr) {
+        sContextStorage[mPortId] = nullptr;
+    }
 }
 
 void ContextWrapper::send(quint8 id, const QByteArray& payload) {
     assert(mContext != nullptr);
-    min_send_frame(mContext.get(), mPortId,
+    min_send_frame(mContext.get(), id,
                    reinterpret_cast<const uint8_t*>(payload.data()),
                    payload.size());
 }

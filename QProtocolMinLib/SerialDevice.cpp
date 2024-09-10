@@ -1,5 +1,8 @@
 #include "SerialDevice.h"
 #include <QSerialPort>
+#include <QDebug>
+#include <QEventLoop>
+#include <QTimer>
 #include "ContextWrapper.h"
 
 namespace min {
@@ -9,9 +12,9 @@ SerialDevice::SerialDevice(QObject *parent)
     mContextWrapper = new ContextWrapper{this};
     mSerialPort = new QSerialPort{this};
     connect(mSerialPort, &QSerialPort::readyRead,
-            this, &SerialDevice::onBytesAvailable);
+            this, &SerialDevice::onSerialPortReadyRead);
     connect(mContextWrapper, &ContextWrapper::frameSended,
-            this, &SerialDevice::onFrameReadyToSend);
+            this, &SerialDevice::onFrameReadyWrite);
     connect(mContextWrapper, &ContextWrapper::frameReceived,
             this, &SerialDevice::frameReceived);
 }
@@ -28,15 +31,33 @@ bool SerialDevice::open(const QString& name, quint32 baudRate) {
 }
 
 void SerialDevice::sendFrame(quint8 id, const QByteArray& payload) {
+    qDebug() << __FUNCTION__ << id << payload;
     mContextWrapper->send(id, payload);
 }
 
-void SerialDevice::onBytesAvailable() {
+bool SerialDevice::waitFrame(quint8& idOut, QByteArray& payloadOut, quint32 timeoutMs) {
+    auto loop = QEventLoop{};
+    auto timer = QTimer{};
+    timer.setInterval(timeoutMs);
+    connect(&timer, &QTimer::timeout,
+            &loop, &QEventLoop::quit);
+    connect(mContextWrapper, &ContextWrapper::frameReceived, &loop,
+            [&idOut, &payloadOut, &loop](quint8 id, const QByteArray& bytes){
+        idOut = id;
+        payloadOut = bytes;
+        loop.exit(1);
+    });
+    timer.start();
+    return loop.exec() == 1;
+}
+
+void SerialDevice::onSerialPortReadyRead() {
     mContextWrapper->poll(mSerialPort->readAll());
 }
 
-void SerialDevice::onFrameReadyToSend(const QByteArray& bytes) {
-    mSerialPort->write(bytes);
+void SerialDevice::onFrameReadyWrite(const QByteArray& frameBytes) {
+    qDebug() << __FUNCTION__ << frameBytes;
+    mSerialPort->write(frameBytes);
 }
 
 } // namespace min
