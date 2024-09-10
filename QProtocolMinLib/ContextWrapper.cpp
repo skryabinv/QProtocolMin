@@ -66,9 +66,9 @@ ContextWrapper::~ContextWrapper() {
     }
 }
 
-void ContextWrapper::send(quint8 id, const QByteArray& payload) {
+void ContextWrapper::send(quint8 frameId, const QByteArray& payload) {
     assert(mContext != nullptr);
-    min_send_frame(mContext.get(), id,
+    min_send_frame(mContext.get(), frameId,
                    reinterpret_cast<const uint8_t*>(payload.data()),
                    payload.size());
 }
@@ -84,11 +84,11 @@ void ContextWrapper::sendFrame() {
     emit frameSended(mBytesToSend);
 }
 
-void ContextWrapper::handleFrame(uint8_t min_id,
+void ContextWrapper::handleFrame(uint8_t frameId,
                                  const uint8_t* min_payload,
                                  uint8_t len_payload) {
     auto payload = QByteArray{reinterpret_cast<const char*>(min_payload), len_payload};
-    emit frameReceived(min_id, payload);
+    emit frameReceived(frameId, payload);
 }
 
 }

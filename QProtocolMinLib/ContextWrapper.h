@@ -23,12 +23,12 @@ namespace min {
 class ContextWrapper : public QObject {
     Q_OBJECT
 signals:
-    void frameReceived(quint8 id, const QByteArray& payload);
+    void frameReceived(quint8 frameId, const QByteArray& payload);
     void frameSended(const QByteArray& frameBytes);
 public:
     ContextWrapper(QObject* parent = nullptr);
     ~ContextWrapper();
-    void send(quint8 id, const QByteArray& payload);
+    void send(quint8 frameId, const QByteArray& payload);
     void poll(const QByteArray& bytes);
 private:    
     friend void ::min_tx_byte(uint8_t port, uint8_t byte);
@@ -39,7 +39,7 @@ private:
                                           uint8_t len_payload,
                                           uint8_t port);
     void sendFrame();
-    void handleFrame(uint8_t min_id,
+    void handleFrame(uint8_t frameId,
                      uint8_t const *min_payload,
                      uint8_t len_payload);
     QByteArray mBytesToSend;
