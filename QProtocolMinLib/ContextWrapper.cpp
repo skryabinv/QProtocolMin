@@ -1,5 +1,6 @@
 #include "ContextWrapper.h"
 #include "min/target/min.h"
+#include <QDebug>
 #include <limits>
 
 constexpr auto sMaxPortsCount = 10;
@@ -50,7 +51,8 @@ ContextWrapper::ContextWrapper(QObject* parent)
     : QObject{parent} {
     auto id = findEmptyContextId();
     if(!id.has_value()) {
-        throw std::runtime_error("No port available");
+        qCritical() << "No port available";
+        return;
     }
     mPortId = *id;
     sContextStorage[mPortId] = this;

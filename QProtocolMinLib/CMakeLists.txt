@@ -15,7 +15,8 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core SerialPort)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core SerialPort)
 
 add_library(QProtocolMinLib STATIC
-    ContextWrapper.h ContextWrapper.cpp)
+    ContextWrapper.h ContextWrapper.cpp
+    SerialDevice.h SerialDevice.cpp)
 target_link_libraries(QProtocolMinLib Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::SerialPort)
 
 add_subdirectory(min)
