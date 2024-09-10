@@ -10,6 +10,9 @@ namespace min {
 SerialDevice::SerialDevice(QObject *parent)
     : QObject{parent} {
     mContextWrapper = new ContextWrapper{this};
+    if(!mContextWrapper->isValid()) {
+        return;
+    }
     mSerialPort = new QSerialPort{this};
     connect(mSerialPort, &QSerialPort::readyRead,
             this, &SerialDevice::onSerialPortReadyRead);
@@ -22,6 +25,10 @@ SerialDevice::SerialDevice(QObject *parent)
 }
 
 bool SerialDevice::open(const QString& name, quint32 baudRate) {
+    if(!mContextWrapper->isValid()) {
+        qCritical() << "Can't open serial device without valid MIN context";
+        return false;
+    }
     if(mSerialPort->isOpen()) {
         mSerialPort->close();
     }
@@ -33,11 +40,17 @@ bool SerialDevice::open(const QString& name, quint32 baudRate) {
 }
 
 void SerialDevice::sendFrame(quint8 id, const QByteArray& payload) {
-    qDebug() << __FUNCTION__ << id << payload;
+    if(!mContextWrapper->isValid()) {
+        qCritical() << "Can't send frame over serial device without valid MIN context";
+        return;
+    }
     mContextWrapper->send(id, payload);
 }
 
 bool SerialDevice::waitFrame(quint8& idOut, QByteArray& payloadOut, quint32 timeoutMs) {
+    if(!mContextWrapper->isValid()) {
+        return false;
+    }
     auto loop = QEventLoop{};
     auto timer = QTimer{};
     timer.setInterval(timeoutMs);
@@ -59,12 +72,10 @@ void SerialDevice::onSerialPortError() {
 
 void SerialDevice::onSerialPortReadyRead() {
     auto bytes = mSerialPort->readAll();
-    qDebug() << __FUNCTION__ << bytes;
     mContextWrapper->poll(bytes);
 }
 
-void SerialDevice::onFrameReadyWrite(const QByteArray& frameBytes) {
-    qDebug() << __FUNCTION__ << frameBytes;
+void SerialDevice::onFrameReadyWrite(const QByteArray& frameBytes) {    
     mSerialPort->write(frameBytes);
 }
 

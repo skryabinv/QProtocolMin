@@ -28,6 +28,7 @@ signals:
 public:
     ContextWrapper(QObject* parent = nullptr);
     ~ContextWrapper();
+    bool isValid() const;
     void send(quint8 frameId, const QByteArray& payload);
     void poll(const QByteArray& bytes);
 private:    

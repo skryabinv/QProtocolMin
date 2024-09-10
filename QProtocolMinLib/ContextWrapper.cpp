@@ -61,9 +61,13 @@ ContextWrapper::ContextWrapper(QObject* parent)
 }
 
 ContextWrapper::~ContextWrapper() {
-    if(mContext != nullptr) {
+    if(isValid()) {
         sContextStorage[mPortId] = nullptr;
     }
+}
+
+bool ContextWrapper::isValid() const {
+    return mContext != nullptr;
 }
 
 void ContextWrapper::send(quint8 frameId, const QByteArray& payload) {
