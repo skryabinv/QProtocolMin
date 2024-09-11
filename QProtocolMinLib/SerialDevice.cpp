@@ -40,7 +40,7 @@ bool SerialDevice::openSerialPort(const QString& name, quint32 baudRate) {
 
 void SerialDevice::sendFrame(quint8 id, const QByteArray& payload) {
     if(!isValid()) {
-        qCritical() << "Try to use invalid serial device";
+        qCritical() << "Trying to use invalid serial device";
         return;
     }
     mContextWrapper->send(id, payload);
@@ -48,7 +48,7 @@ void SerialDevice::sendFrame(quint8 id, const QByteArray& payload) {
 
 bool SerialDevice::waitForFrame(quint8& idOut, QByteArray& payloadOut, quint32 timeoutMs) {
     if(!isValid()) {
-        qCritical() << "Try to use invalid serial device";
+        qCritical() << "Trying to use invalid serial device";
         return false;
     }
     auto loop = QEventLoop{};
