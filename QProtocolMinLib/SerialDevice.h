@@ -2,7 +2,7 @@
 
 #include <QObject>
 
-class QSerialPort;
+class QIODevice;
 
 namespace min {
 
@@ -12,17 +12,18 @@ class SerialDevice : public QObject {
     Q_OBJECT
 public:
     explicit SerialDevice(QObject *parent = nullptr);
-    bool open(const QString& name, quint32 baudRate = 115200);
+    bool openSerialPort(const QString& name, quint32 baudRate = 115200);
     void sendFrame(quint8 id, const QByteArray& payload);
-    bool waitFrame(quint8& idOut, QByteArray& payloadOut, quint32 timeoutMs);
+    bool waitForFrame(quint8& idOut, QByteArray& payloadOut, quint32 timeoutMs);
+    bool isValid() const;
 signals:
     void error(const QString& message);
     void frameReceived(quint8 id, const QByteArray& payload);
 private:
-    void onSerialPortError();
-    void onSerialPortReadyRead();
+    void onIODeviceError();
+    void onIODeviceReadyRead();
     void onFrameReadyWrite(const QByteArray& frameBytes);
-    QSerialPort* mSerialPort{};
+    QIODevice* mIODevice{};
     ContextWrapper* mContextWrapper{};
 };
 

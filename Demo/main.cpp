@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     min::SerialDevice device;
-    qDebug() << "Open device" << device.open("COM25");
+    qDebug() << "Open device" << device.openSerialPort("COM25");
     QTimer timer;
     QObject::connect(&timer, &QTimer::timeout, &timer, [&device]{
         device.sendFrame(11, QByteArray("Hello World"));
