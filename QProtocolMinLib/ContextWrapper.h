@@ -27,7 +27,7 @@ signals:
     void frameSended(const QByteArray& frameBytes);
 public:
     explicit ContextWrapper(QObject* parent = nullptr);
-    ~ContextWrapper();
+    ~ContextWrapper() override;
     bool isValid() const;
     void send(quint8 frameId, const QByteArray& payload);
     void poll(const QByteArray& bytes);
