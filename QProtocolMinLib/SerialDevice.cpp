@@ -44,6 +44,7 @@ void SerialDevice::sendFrame(quint8 id, const QByteArray& payload) {
         return;
     }
     mContextWrapper->send(id, payload);
+    emit frameSended(id, payload);
 }
 
 bool SerialDevice::waitForFrame(quint8& idOut, QByteArray& payloadOut, quint32 timeoutMs) {

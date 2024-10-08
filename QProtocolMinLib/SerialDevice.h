@@ -19,6 +19,7 @@ public:
 signals:
     void error(const QString& message);
     void frameReceived(quint8 id, const QByteArray& payload);
+    void frameSended(quint8 id, const QByteArray& payload);
 private:
     void onIODeviceError();
     void onIODeviceReadyRead();
