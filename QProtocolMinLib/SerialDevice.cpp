@@ -12,7 +12,7 @@ SerialDevice::SerialDevice(QObject *parent)
     mContextWrapper = new ContextWrapper{this};
     if(!mContextWrapper->isValid()) {
         return;
-    }     
+    }
     connect(mContextWrapper, &ContextWrapper::frameSended,
             this, &SerialDevice::onFrameReadyWrite);
     connect(mContextWrapper, &ContextWrapper::frameReceived,
@@ -30,12 +30,15 @@ bool SerialDevice::openSerialPort(const QString& name, quint32 baudRate) {
     serialPort->setBaudRate(baudRate);
     serialPort->setDataBits(QSerialPort::Data8);
     serialPort->setStopBits(QSerialPort::OneStop);
-    connect(serialPort, &QSerialPort::errorOccurred,
-            this, &SerialDevice::onIODeviceError);
-    connect(serialPort, &QSerialPort::readyRead,
-            this, &SerialDevice::onIODeviceReadyRead);
-    mIODevice = serialPort;
-    return mIODevice->open(QIODevice::ReadWrite);
+    auto opened =  serialPort->open(QIODevice::ReadWrite);
+    if(opened) {
+        connect(serialPort, &QSerialPort::errorOccurred,
+                this, &SerialDevice::onIODeviceError);
+        connect(serialPort, &QSerialPort::readyRead,
+                this, &SerialDevice::onIODeviceReadyRead);
+        mIODevice = serialPort;
+    }
+    return opened;
 }
 
 void SerialDevice::sendFrame(quint8 id, const QByteArray& payload) {
@@ -73,7 +76,9 @@ bool SerialDevice::isValid() const {
 
 void SerialDevice::onIODeviceError() {
     assert(mIODevice != nullptr);
-    emit error(mIODevice->errorString());
+    auto errorString = mIODevice->errorString();
+    delete mIODevice;
+    emit error(errorString);
 }
 
 void SerialDevice::onIODeviceReadyRead() {

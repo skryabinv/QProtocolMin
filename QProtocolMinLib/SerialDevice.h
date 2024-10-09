@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QPointer>
 
 class QIODevice;
 
@@ -24,7 +25,7 @@ private:
     void onIODeviceError();
     void onIODeviceReadyRead();
     void onFrameReadyWrite(const QByteArray& frameBytes);
-    QIODevice* mIODevice{};
+    QPointer<QIODevice> mIODevice{};
     ContextWrapper* mContextWrapper{};
 };
 
